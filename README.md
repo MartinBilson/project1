@@ -6,4 +6,5 @@
 5. python iterators
 6. Python polymorphisms
 
+
 Where upon understanding i was trying to code real life scenerios where those concepts are applicable.
