@@ -1,0 +1,50 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+# URL of the Jumia website to scrape
+url = "https://www.jumia.co.ke/phones-tablets/"
+
+# User-Agent header to mimic a browser
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0 Safari/537.36"
+}
+
+# Send GET request to the website
+response = requests.get(url, headers=headers)
+
+# Check if the request was successful
+if response.status_code == 200:
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # List to store scraped data
+    product_data = []
+
+    # Find all product containers
+    products = soup.find_all('article', class_='prd _fb col c-prd')
+
+    for product in products:
+        # Extract product name
+        name = product.find('h3', class_='name').text if product.find('h3', class_='name') else "N/A"
+
+        # Extract product price
+        price = product.find('div', class_='prc').text if product.find('div', class_='prc') else "N/A"
+
+        # Extract product rating
+        rating = product.find('div', class_='stars _s').get('data-stars') if product.find('div', class_='stars _s') else "No Rating"
+
+        # Append data to list
+        product_data.append([name, price, rating])
+
+    # Save data to a CSV file
+    with open('jumia_products.csv', 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        # Write headers
+        writer.writerow(['Product Name', 'Price', 'Rating'])
+        # Write product data
+        writer.writerows(product_data)
+
+    print("Data has been successfully scraped and saved to 'jumia_products.csv'.")
+
+else:
+    print(f"Failed to retrieve the website. Status code: {response.status_code}")
